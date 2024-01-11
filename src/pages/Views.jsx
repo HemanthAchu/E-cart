@@ -3,7 +3,8 @@ import { Col, Row,Button } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { addToWishlist } from '../Redux/Slices/wishlistSlice'
-
+import { addtoCart } from '../Redux/Slices/CartSlice'
+import Header from '../Components/Header'
 const Views = () => {
   const dispatch=useDispatch()
 const {id} =useParams()
@@ -25,8 +26,10 @@ const [product,setproduct] =useState({})
   }
     }
   return (
+<>
+<Header/>
     <div className=' m-4'>
-    <Row className='m-4 align-items-center' >
+    <Row className='m-4 align-items-center'>
     <Col className='col-md-4 ' >
       <img className='shadow rounded ' style={{height:"400px",width:'100%'}} src={product?.thumbnail} />
       </Col>
@@ -42,10 +45,10 @@ const [product,setproduct] =useState({})
         </p>
         <div className='d-flex justify-content-between align-items-center'>
          <Button onClick={()=>handleWishlist(product)} className='btn btn-outline-dark fs-5 d-flex justify-content-between align-items-center p-2'><i style={{color:'red'}} class="fa-solid fa-heart  px-2"></i>Wishlist</Button>
-        <Button  className='btn  d-flex justify-content-between align-items-center btn-outline-dark fs-5 p-2'><i  class="fa-solid fa-cart-shopping px-3 text-success">Cart</i></Button></div>
+        <Button  onClick={()=>dispatch(addtoCart(product))} className='btn  d-flex justify-content-between align-items-center btn-outline-dark fs-5 p-2'><i  class="fa-solid fa-cart-shopping px-3 text-success">Cart</i></Button></div>
       </Col>
     </Row>
-    </div>
+    </div></>
   )
 }
 

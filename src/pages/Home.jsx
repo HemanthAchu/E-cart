@@ -2,15 +2,21 @@ import React, { useEffect } from 'react'
 import { Col, Row ,Card,Button,Spinner} from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import  { fetchproducts } from '../Redux/Slices/ProductSlice'
+import  { fetchproducts, onNavigateNext, onNavigatePev} from '../Redux/Slices/ProductSlice'
 import { addToWishlist } from '../Redux/Slices/wishlistSlice'
 import { addtoCart } from '../Redux/Slices/CartSlice'
+import Header from '../Components/Header'
 
 const Home = () => {
+  
   const dispatch =useDispatch()
-
-  const {products,loading,error} = useSelector((state)=>state.ProductSlice)
+  const {products,loading,error,productsPerPage,currentPage} = useSelector((state)=>state.ProductSlice)
 const {wishlist} =useSelector((state)=>state.wishlistSlice)
+const  totalpages = Math.ceil(products?.length/productsPerPage)
+const indexOfLastItem = currentPage * productsPerPage
+const indexOfFirstItem = indexOfLastItem - productsPerPage
+const visibleCards =products?.slice(indexOfFirstItem,indexOfLastItem) 
+
 
   useEffect(()=>{
     dispatch(fetchproducts())
@@ -24,13 +30,28 @@ if(existingProduct){
 }
   }
 
+  const naviagteprev =()=>{
+    if(currentPage!==1){
+      dispatch(onNavigatePev())
+
+    }
+  }
+  const navigatenext = ()=>{
+    if(currentPage!=totalpages){
+      dispatch(onNavigateNext())
+    }
+  }
 
   return (
     <div>
+       <Header insideHome/>
       {
-        loading? <div className=' text-center my-5'> <Spinner animation="border" variant="danger"/>Loading...</div>: 
+        !loading&&error?<div className='text-center text-danger fw-bolder m-5'>{error}</div>:null
+      }
+      {
+        loading?<div className=' text-center my-5'> <Spinner animation="border" variant="danger"/>Loading...</div>: 
          <Row className='m-4'>
-          {products.length>0&&products.map((product,index)=>(
+          {products.length>0?visibleCards.map((product,index)=>(
             <Col key={index} className='mt-5' sm={12}  md={6} lg={4} xl={3} >
         <Card className='shadow rounded' style={{ width: '18rem' }}>
         <Link to={`/views/${product.id}`}>
@@ -44,9 +65,13 @@ if(existingProduct){
         </Card.Body>
       </Card>
         </Col>
-          ))}
+          )): !error&&<div className='text-center text-danger fw-bolder m-5'>NO Found :(</div>}
         
-        
+        <div className="d-flex justify-content-center fw-bolder">
+          <span onClick={naviagteprev} className='btn pt-2 '><i class="fa-solid fa-angles-left"></i></span>
+          <span className='btn'>{currentPage} of {totalpages}</span>
+          <span onClick={navigatenext} className='btn pt-2 '><i class="fa-solid fa-angles-right"></i></span>
+        </div>
        
  
       </Row>

@@ -3,13 +3,19 @@ import { Row,Col,Button, Card } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link} from 'react-router-dom'
 import { removeFromWishlist } from '../Redux/Slices/wishlistSlice'
-
+import { addtoCart } from '../Redux/Slices/CartSlice'
+import Header from '../Components/Header'
 const Wishlist = () => {
  const dispatch = useDispatch()
   const wishlist =useSelector(state=>state.wishlistSlice.wishlist)
 
+  const handlecart =(products)=>{
+    dispatch(removeFromWishlist(products.id))
+    dispatch(addtoCart(products))
+  }
   return (
     <div>
+      <Header/>
     <Row className='m-4'>
       
 { wishlist?.length>0?wishlist?.map(products=>(
@@ -22,7 +28,7 @@ const Wishlist = () => {
     <Card.Title>{products.title.slice(0,20)}...</Card.Title>
    <div className='d-flex justify-content-between align-items-center'>
      <Button onClick={()=>dispatch(removeFromWishlist(products.id))}  className='btn btn-light'><i style={{color:'red'}} class="fa-solid fa-heart-circle-xmark fs-4 p-2"></i></Button>
-    <Button  className='btn btn-light d-flex justify-content-between align-items-center'><i style={{color:'skyblue'}} class="fa-solid fa-cart-shopping fs-4 p-3"></i></Button></div>
+    <Button onClick={()=>handlecart(products)}  className='btn btn-light d-flex justify-content-between align-items-center'><i style={{color:'skyblue'}} class="fa-solid fa-cart-shopping fs-4 p-3"></i></Button></div>
   </Card.Body>
 </Card>
   </Col>

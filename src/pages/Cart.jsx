@@ -1,11 +1,43 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Col, Row, Table } from 'react-bootstrap'
-import { useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link, useNavigate } from 'react-router-dom'
+import { addtoCart, decQuantity, emptyCart, incQuantity, removeCart } from '../Redux/Slices/CartSlice'
+import Header from '../Components/Header'
 
 const Cart = () => {
+  const navigate =useNavigate()
+  const dispatch =useDispatch()
   const cart =useSelector(state=>state.cartReducer)
+  const [cartamount,setcartamount] = useState(0)
+  useEffect(()=>{ 
+
+    if(cart.length>0){
+     setcartamount(cart.map(carts=>carts.totalPrice).reduce((a,b)=>a+b))
+
+    }else{
+      setcartamount(0)
+    }
+
+
+  },[cart])
+
+ const  handlecheckout =()=>{
+  alert("Your order has successfully placed... Thank you purchasing with us!!!")
+  dispatch(emptyCart())
+  navigate('/')
+ }
+ const handledec =(carts)=>{
+if(carts.quantity==1){
+dispatch( removeCart(carts.id))
+}else{
+  dispatch(decQuantity(carts))
+}
+ }
+
   return (
+    <>
+    <Header/>
     <div className='container mb-5'>
 
      {cart?.length>0?
@@ -18,6 +50,7 @@ const Cart = () => {
               <th>product</th>
               <th>Image</th>
               <th>Price</th>
+              <th>Quantity</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -26,18 +59,24 @@ const Cart = () => {
               <td>{index+1}</td>
               <td>{carts.title}</td>
               <td><img style={{height:"100px",width:"100px"}} src={carts.thumbnail} /></td>
-              <td>$ {carts.price}</td>
-              <td><i class="fa-solid fa-trash"></i></td>
+              <td>$ {carts.totalPrice}</td>
+              <td> <button onClick={()=>handledec(carts)}  className='btn'   >-</button> <input className='ps-3' type="text" value={carts.quantity} style={{width:'50px'}} readOnly /><button onClick={()=>dispatch(incQuantity(carts))} className='btn'>+</button></td>
+
+              <td><i onClick={()=>dispatch( removeCart(carts.id))} class="fa-solid fa-trash"></i></td>
             </tr>))}
           </tbody>
         </Table>
+        <div className='float-end'>
+          <button onClick={()=>dispatch(emptyCart())} className='btn btn-danger me-3' >Empty Cart</button>
+          <Link to={"/"} ><button onClick={()=>dispatch(emptyCart())} className='btn btn-primary'>Shop More</button></Link>
+        </div>
       </Col>
       <Col className='col-lg-4'>
 <div className='d-flex flex-column border rounded  p-4'>
-  <h5>Total product: <span className='fw-bolder' >3</span></h5>
-  <h2>Total Amount: <span className='fw-bolder' >$ 856</span></h2>
+  <h5>Total product: <span className='fw-bolder' >{cart?.length}</span></h5>
+  <h2>Total Amount: <span className='fw-bolder ' style={{color:'red'}} >$ {cartamount}</span></h2>
   <hr />
-  <button className='btn btn-success' >Checkout</button>
+  <button onClick={handlecheckout} className='btn btn-success' >Checkout</button>
 
 </div>
       </Col>
@@ -49,7 +88,7 @@ const Cart = () => {
       </div>
 
      }
-    </div>
+    </div></>
   )
 }
 

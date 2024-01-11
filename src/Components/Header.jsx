@@ -5,9 +5,11 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { productSearch } from '../Redux/Slices/ProductSlice';
 
-function FormExample() {
+function FormExample({insideHome}) {
+  const dispatch =useDispatch()
   const [carts,cartcount] = useState(0)
   const  [wishlistcount,setwishlistcount] = useState(0)
   const wishlist =useSelector(state=>state.wishlistSlice.wishlist)
@@ -24,6 +26,9 @@ function FormExample() {
       <i style={{height:"41px",color:'#047BD5'}} class="fa-solid fa-truck-fast"></i> G-Cart
       </h1>
      </Link>
+     {insideHome&&<div>
+      <input onChange={e=>dispatch(productSearch(e.target.value.toLowerCase()))} type="text" className='form-control' placeholder='search products!!' />
+     </div>}
       <Form inline="true">
         <Row>
           <Col xs="auto">
